@@ -9,6 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
   StatusBar,
   BackHandler,
   Modal,
@@ -17,7 +18,6 @@ import {
 import VLCPlayer from '../VLCPlayer';
 import PropTypes from 'prop-types';
 import TimeLimt from './TimeLimit';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getStatusBarHeight } from './SizeController';
 const statusBarHeight = getStatusBarHeight();
 let deviceHeight = Dimensions.get('window').height;
@@ -151,7 +151,7 @@ export default class VLCPlayerView extends Component {
                 justifyContent: 'center',
                 marginTop: 10,
               }}>
-              <Icon name={'reload'} size={45} color="#fff" />
+              <Image source={require('./reload.png')} style={{ width: 45, height: 45 }} />
             </TouchableOpacity>
           </View>
         )}
