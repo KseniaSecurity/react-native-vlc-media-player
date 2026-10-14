@@ -146,8 +146,6 @@ import Orientation from 'react-native-orientation';
   showGG={true}
   showTitle={true}
   title="Big Buck Bunny"
-  showBack={true}
-  onLeftPress={()=>{}}
 />
 ```
 

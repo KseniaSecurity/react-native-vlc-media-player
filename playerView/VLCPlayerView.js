@@ -78,11 +78,7 @@ export default class VLCPlayerView extends Component {
       style,
       isGG,
       type,
-      isFull,
       uri,
-      onLeftPress,
-      closeFullScreen,
-      showBack,
       videoAspectRatio,
       errorTitle
     } = this.props;
@@ -161,20 +157,6 @@ export default class VLCPlayerView extends Component {
         )}
         <View style={styles.topView}>
           <View style={styles.backBtn}>
-            {showBack && (
-              <TouchableOpacity
-                onPress={() => {
-                  if (isFull) {
-                    closeFullScreen && closeFullScreen();
-                  } else {
-                    onLeftPress && onLeftPress();
-                  }
-                }}
-                style={styles.btn}
-                activeOpacity={0.8}>
-                <Icon name={'chevron-left'} size={30} color="#fff" />
-              </TouchableOpacity>
-            )}
             <View style={{ justifyContent: 'center', flex: 1, marginRight: 10 }} />
             {showGG && (
               <View style={styles.GG}>
@@ -439,16 +421,5 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  btn: {
-    marginLeft: 10,
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    height: 40,
-    borderRadius: 20,
-    width: 40,
-    paddingTop: 3,
   },
 });

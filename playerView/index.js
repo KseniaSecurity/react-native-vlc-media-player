@@ -8,7 +8,6 @@ import {
   View,
   StyleSheet,
   Platform,
-  TouchableOpacity,
   Text,
   Dimensions,
   BackHandler,
@@ -16,7 +15,6 @@ import {
 
 import VLCPlayerView from './VLCPlayerView';
 import PropTypes from 'prop-types';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getStatusBarHeight } from './SizeController';
 const statusBarHeight = getStatusBarHeight();
 const _fullKey = 'commonVideo_android_fullKey';
@@ -49,7 +47,6 @@ export default class CommonVideo extends Component {
     showGG: false,
     ggUrl: '',
     url: '',
-    showBack: false,
     showTitle: false,
   };
 
@@ -76,17 +73,9 @@ export default class CommonVideo extends Component {
      */
     closeFullScreen: PropTypes.func,
     /**
-     * 返回按钮点击事件
-     */
-    onLeftPress: PropTypes.func,
-    /**
      * 标题
      */
     title: PropTypes.string,
-    /**
-     * 是否显示返回按钮
-     */
-    showBack: PropTypes.bool,
     /**
      * 是否显示标题
      */
@@ -191,7 +180,7 @@ export default class CommonVideo extends Component {
   }
 
   render() {
-    let { url, ggUrl, showGG, onGGEnd, onEnd, onError, style, height, title, onLeftPress, showBack, showTitle, closeFullScreen, videoAspectRatio, fullVideoAspectRatio } = this.props;
+    let { url, ggUrl, showGG, onGGEnd, onEnd, onError, style, height, title, showTitle, videoAspectRatio, fullVideoAspectRatio } = this.props;
     let { isEndGG, isFull, currentUrl } = this.state;
     let currentVideoAspectRatio = '';
     if (isFull) {
@@ -237,19 +226,6 @@ export default class CommonVideo extends Component {
         style={[isFull ? styles.container : { height: 200, backgroundColor: '#000' }, style]}>
         {showTop && <View style={styles.topView}>
           <View style={styles.backBtn}>
-            {showBack && <TouchableOpacity
-              onPress={() => {
-                if (isFull) {
-                  closeFullScreen && closeFullScreen();
-                } else {
-                  onLeftPress && onLeftPress();
-                }
-              }}
-              style={styles.btn}
-              activeOpacity={0.8}>
-              <Icon name={'chevron-left'} size={30} color="#fff" />
-            </TouchableOpacity>
-            }
             <View style={{ justifyContent: 'center', flex: 1, marginRight: 10 }}>
               {showTitle &&
                 <Text style={{ color: '#fff', fontSize: 16 }} numberOfLines={1}>{title}</Text>
@@ -266,15 +242,10 @@ export default class CommonVideo extends Component {
             source={{ uri: ggUrl, type: ggType }}
             type={ggType}
             isGG={true}
-            showBack={showBack}
-            showTitle={showTitle}
-            isFull={isFull}
             onEnd={() => {
               onGGEnd && onGGEnd();
               this.setState({ isEndGG: true });
             }}
-            startFullScreen={this._toFullScreen}
-            closeFullScreen={this._closeFullScreen}
           />
         )}
 
@@ -283,19 +254,12 @@ export default class CommonVideo extends Component {
             {...this.props}
             uri={currentUrl}
             videoAspectRatio={currentVideoAspectRatio}
-            onLeftPress={onLeftPress}
-            title={title}
             type={type}
-            isFull={isFull}
-            showBack={showBack}
-            showTitle={showTitle}
             hadGG={true}
             isEndGG={isEndGG}
             //initPaused={this.state.paused}
             style={showGG && !isEndGG ? { position: 'absolute', zIndex: -1 } : {}}
             source={{ uri: currentUrl, type: type }}
-            startFullScreen={this._toFullScreen}
-            closeFullScreen={this._closeFullScreen}
             onEnd={() => {
               onEnd && onEnd();
             }}
@@ -326,15 +290,5 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center'
-  },
-  btn: {
-    marginLeft: 10,
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    height: 40,
-    borderRadius: 20,
-    width: 40,
   }
 });
