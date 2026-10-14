@@ -17,7 +17,6 @@ import {
 import VLCPlayer from '../VLCPlayer';
 import PropTypes from 'prop-types';
 import TimeLimt from './TimeLimit';
-import ControlBtn from './ControlBtn';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getStatusBarHeight } from './SizeController';
 const statusBarHeight = getStatusBarHeight();
@@ -37,11 +36,9 @@ export default class VLCPlayerView extends Component {
       isFull: false,
       currentTime: 0.0,
       totalTime: 0.0,
-      showControls: false,
       seek: 0,
       isError: false,
     };
-    this.touchTime = 0;
     this.changeUrl = false;
     this.isEnding = false;
     this.reloadSuccess = false;
@@ -56,14 +53,6 @@ export default class VLCPlayerView extends Component {
     autoplay: true,
     errorTitle: 'error'
   };
-
-  componentDidMount() {
-    if (this.props.isFull) {
-      this.setState({
-        showControls: true,
-      });
-    }
-  }
 
   componentWillUnmount() {
     this.vlcPlayer._onStopped()
@@ -91,22 +80,13 @@ export default class VLCPlayerView extends Component {
       type,
       isFull,
       uri,
-      title,
       onLeftPress,
       closeFullScreen,
       showBack,
-      showTitle,
       videoAspectRatio,
-      showGoLive,
-      onGoLivePress,
-      onReplayPress,
-      titleGolive,
-      showLeftButton,
-      showMiddleButton,
-      showRightButton,
       errorTitle
     } = this.props;
-    let { isLoading, loadingSuccess, showControls, isError } = this.state;
+    let { isLoading, loadingSuccess, isError } = this.state;
     let showGG = false;
     let realShowLoding = false;
     let source = {};
@@ -136,19 +116,7 @@ export default class VLCPlayerView extends Component {
     return (
       <TouchableOpacity
         activeOpacity={1}
-        style={[styles.videoBtn, style]}
-        onPressOut={() => {
-          let currentTime = new Date().getTime();
-          if (this.touchTime === 0) {
-            this.touchTime = currentTime;
-            this.setState({ showControls: !this.state.showControls });
-          } else {
-            if (currentTime - this.touchTime >= 500) {
-              this.touchTime = currentTime;
-              this.setState({ showControls: !this.state.showControls });
-            }
-          }
-        }}>
+        style={[styles.videoBtn, style]}>
         <VLCPlayer
           ref={ref => (this.vlcPlayer = ref)}
           paused={this.state.paused}
@@ -207,14 +175,7 @@ export default class VLCPlayerView extends Component {
                 <Icon name={'chevron-left'} size={30} color="#fff" />
               </TouchableOpacity>
             )}
-            <View style={{ justifyContent: 'center', flex: 1, marginRight: 10 }}>
-              {showTitle &&
-                showControls && (
-                  <Text style={{ color: '#fff', fontSize: 16 }} numberOfLines={1}>
-                    {title}
-                  </Text>
-                )}
-            </View>
+            <View style={{ justifyContent: 'center', flex: 1, marginRight: 10 }} />
             {showGG && (
               <View style={styles.GG}>
                 <TimeLimt
@@ -226,45 +187,6 @@ export default class VLCPlayerView extends Component {
               </View>
             )}
           </View>
-        </View>
-        <View style={[styles.bottomView]}>
-          {showControls && (
-            <ControlBtn
-              //style={isFull?{width:deviceHeight}:{}}
-              showSlider={!isGG}
-              showGG={showGG}
-              onEnd={onEnd}
-              title={title}
-              onLeftPress={onLeftPress}
-              paused={this.state.paused}
-              isFull={isFull}
-              currentTime={this.state.currentTime}
-              totalTime={this.state.totalTime}
-              onPausedPress={this._play}
-              onFullPress={this._toFullScreen}
-              onValueChange={value => {
-                this.changingSlider = true;
-                this.setState({
-                  currentTime: value,
-                });
-              }}
-              onSlidingComplete={value => {
-                this.changingSlider = false;
-                if (Platform.OS === 'ios') {
-                  this.vlcPlayer.seek(Number((value / this.state.totalTime).toFixed(17)));
-                } else {
-                  this.vlcPlayer.seek(value);
-                }
-              }}
-              showGoLive={showGoLive}
-              onGoLivePress={onGoLivePress}
-              onReplayPress={onReplayPress}
-              titleGolive={titleGolive}
-              showLeftButton={showLeftButton}
-              showMiddleButton={showMiddleButton}
-              showRightButton={showRightButton}
-            />
-          )}
         </View>
       </TouchableOpacity>
     );
@@ -410,18 +332,16 @@ export default class VLCPlayerView extends Component {
     if (currentTime > 0 || this.state.currentTime > 0) {
       loadingSuccess = true;
     }
-    if (!this.changingSlider) {
-      if (currentTime === 0 || currentTime === this.state.currentTime * 1000) {
-      } else {
-        this.setState({
-          loadingSuccess: loadingSuccess,
-          isLoading: false,
-          isError: false,
-          progress: event.position,
-          currentTime: event.currentTime / 1000,
-          totalTime: event.duration / 1000,
-        });
-      }
+    if (currentTime === 0 || currentTime === this.state.currentTime * 1000) {
+    } else {
+      this.setState({
+        loadingSuccess: loadingSuccess,
+        isLoading: false,
+        isError: false,
+        progress: event.position,
+        currentTime: event.currentTime / 1000,
+        totalTime: event.duration / 1000,
+      });
     }
   }
 
@@ -471,27 +391,6 @@ export default class VLCPlayerView extends Component {
       });*/
     }
   }
-
-  /**
-   * 全屏
-   * @private
-   */
-  _toFullScreen = () => {
-    let { startFullScreen, closeFullScreen, isFull } = this.props;
-    if (isFull) {
-      closeFullScreen && closeFullScreen();
-    } else {
-      startFullScreen && startFullScreen();
-    }
-  };
-
-  /**
-   * 播放/停止
-   * @private
-   */
-  _play = () => {
-    this.setState({ paused: !this.state.paused });
-  };
 }
 
 const styles = StyleSheet.create({
@@ -534,14 +433,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     //backgroundColor: 'red'
-  },
-  bottomView: {
-    bottom: 0,
-    left: 0,
-    height: 50,
-    position: 'absolute',
-    width: '100%',
-    backgroundColor: 'rgba(0,0,0,0)',
   },
   backBtn: {
     height: 45,
